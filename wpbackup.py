@@ -85,6 +85,7 @@ def upload():
 #    sftp.close()
 #    transport.close()
     with pysftp.Connection(sftp_ip, username=sftp_user, private_key=sftp_private_key) as sftp:
+        sftp.cd(remotedir_backup)
         sftp.put(backup_enc,remotedir_backup)
 
 
@@ -100,7 +101,7 @@ def delete_remote():
         remote_files = sftp.listdir()
         sorted_remote_files = sorted(remote_files)
         for n in remote_files:
-            if len(remote_files) > 3 :
+            if len(sorted_remote_files) > 3 :
                 sftp.remove(remote_files[-1]
             else : break
 

@@ -12,6 +12,7 @@ import sys,os
 import tarfile
 import time
 import paramiko
+import pysftp
 from Crypto.PublicKey import RSA
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES, PKCS1_OAEP
@@ -29,7 +30,7 @@ db_password = "qsd123"
 
 #SFTP info
 sftp_user = "wpbackup"
-sftp_password = "qsd123"
+sftp_private_key =  
 sftp_ip = "192.168.122.235"
 sftp_port = 22
 #Directories
@@ -77,19 +78,27 @@ def encrypt_backup():
     #os.system("openssl enc -aes-256-cbc -pbkdf2 -in " + backup_filename + " -out "+ backup_enc +" -pass file:" + public_key)
 
 def upload():
-    transport = Paramiko.Transport(sftp_ip,sftp_port)
-    transport.connect(NONE,sftp_user,sftp_password)
-    sftp = paramiko.SFTPClient.from_transport(transport)
-    sftp.put(backup_enc,remotedir_backup)
-    sftp.close()
-    transport.close()
+#     transport = Paramiko.Transport(sftp_ip,sftp_port)
+#    transport.connect(NONE,sftp_user,sftp_password)
+#    sftp = paramiko.SFTPClient.from_transport(transport)
+#    sftp.put(backup_enc,remotedir_backup)
+#    sftp.close()
+#    transport.close()
+    with pysftp.Connection(sftp_ip, username=sftp_user, private_key=sftp_private_key) as sftp:
+        sftp.put(backup_enc,remotedir_backup)
+
 
 def delete_local():
 #delete 2nd last backup
     os.system("find "+ localdir_backup + " -type f -not -name " + backup_filename + "-delete") 
 
 #def delete_remote():
-#delete 
+#delete all backups older than 3rd
+
+    with pysftp.Connection(sftp_ip, username=sftp_user, private_key=sftp_private_key) as sftp:
+        sftp.cd(remotedir_backup)
+        remote_files = sftp.listdir()
+
 
 ### Exec
 

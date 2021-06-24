@@ -92,12 +92,17 @@ def delete_local():
 #delete 2nd last backup
     os.system("find "+ localdir_backup + " -type f -not -name " + backup_filename + "-delete") 
 
-#def delete_remote():
+def delete_remote():
 #delete all backups older than 3rd
 
     with pysftp.Connection(sftp_ip, username=sftp_user, private_key=sftp_private_key) as sftp:
         sftp.cd(remotedir_backup)
         remote_files = sftp.listdir()
+        sorted_remote_files = sorted(remote_files)
+        for n in remote_files:
+            if len(remote_files) > 3 :
+                sftp.remove(remote_files[-1]
+            else : break
 
 
 ### Exec

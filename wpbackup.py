@@ -13,6 +13,8 @@ import tarfile
 import time
 import paramiko
 from Crypto.PublicKey import RSA
+from Crypto.Random import get_random_bytes
+from Crypto.Cipher import AES, PKCS1_OAEP
 
 ### Variables ###
 
@@ -55,12 +57,22 @@ def backup_site():
     os.remove(db_filename)
 
 def encrypt_backup():
-#openssl via clé pub
-    with open(public_key,'r') as fp:
-	pub = fp.read()
-	fp.close()
-    public = RSA.importKey(pub)
+#Encrypt file using RSA asymmetric encryption of an AES session key.
+
+    data = open(backup_filename, 'r')
+    file_out = open(backup_enc, 'wb')
+    recipient_key = RSA.import_key(open(public_key).read())
+    session_key = get_random_bytes(16)
     
+    # Encrypt the session key with the public RSA key
+    cipher_rsa = PKCS1_OAEP.new(recipient_key)
+    enc_session_key = cipher_rsa.encrypt(session_key)
+
+    # Encrypt the data with the AES session key
+    cipher_aes = AES.new(session_key, AES.MODE_EAX)
+    ciphertext, tag = cipher_aes.encrypt_and_digest(data)
+    [ file_out.write(x) for x in (enc_session_key, cipher_aes.nonce, tag, ciphertext) ]
+    file_out.close()
     
     #os.system("openssl enc -aes-256-cbc -pbkdf2 -in " + backup_filename + " -out "+ backup_enc +" -pass file:" + public_key)
 

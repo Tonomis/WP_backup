@@ -99,10 +99,10 @@ def delete_remote():
     with pysftp.Connection(sftp_ip, username=sftp_user, private_key=sftp_private_key) as sftp:
         sftp.cd(remotedir_backup)
         remote_files = sftp.listdir()
-        sorted_remote_files = sorted(remote_files)
-        for n in remote_files:
+        sorted_remote_files = sorted(remote_files, reverse = True)
+        for n in sorted_remote_files:
             if len(sorted_remote_files) > 3 :
-                sftp.remove(remote_files[-1]
+                sftp.remove(sorted_remote_files[-1])
             else : break
 
 

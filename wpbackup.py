@@ -30,7 +30,7 @@ db_password = "qsd123"
 
 #SFTP info
 sftp_user = "wpbackup"
-sftp_private_key =  
+sftp_private_key = "/home/administrator/.ssh/id_ed25519"
 sftp_ip = "192.168.122.235"
 sftp_port = 22
 #Directories
@@ -99,11 +99,11 @@ def delete_remote():
     with pysftp.Connection(sftp_ip, username=sftp_user, private_key=sftp_private_key) as sftp:
         sftp.cd(remotedir_backup)
         remote_files = sftp.listdir()
-        sorted_remote_files = sorted(remote_files, reverse = True)
+        sorted_remote_files = sorted(remote_files)
         for n in sorted_remote_files:
             if len(sorted_remote_files) > 3 :
-                sftp.remove(sorted_remote_files[-1])
-            else : break
+                sftp.remove(n)
+                sorted_remote_files.remove(n)
 
 
 ### Exec

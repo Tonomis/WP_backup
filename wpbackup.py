@@ -16,9 +16,12 @@ import pysftp
 from Crypto.PublicKey import RSA
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES, PKCS1_OAEP
+import gnupg
 
 ### Variables ###
 
+# Date et heure
+date = time.strftime("%Y-%m-%d")
 #Site info
 site_name = "wordpress" 
 site_path = "/var/www/wordpress"
@@ -35,9 +38,9 @@ sftp_ip = "192.168.122.235"
 sftp_port = 22
 #Directories
 localdir_backup = "/backup/wordpress/"
-remotedir_backup = "~/backup/wordpress/"
-# Date et heure
-date = time.strftime("%Y-%m-%d")
+remotedir_backup = "/home/wpbackup/backup/wordpress/"
+remote_backup = remotedir_backup + "wp_site_backup_" + date + ".tgz.enc"
+
 backup_filename = localdir_backup + "wp_site_backup_" + date + ".tgz"
 db_filename = localdir_backup + "wp_db_backup_" + date + ".sql"
 backup_enc = backup_filename + ".enc"
@@ -60,9 +63,9 @@ def backup_site():
 def encrypt_backup():
 #Encrypt file using RSA asymmetric encryption of an AES session key.
 
-    data = open(backup_filename, 'r')
+    data = open(backup_filename, 'rb').read()
     file_out = open(backup_enc, 'wb')
-    recipient_key = RSA.import_key(open(public_key).read())
+    recipient_key = RSA.importKey(open(public_key).read())
     session_key = get_random_bytes(16)
     
     # Encrypt the session key with the public RSA key
@@ -74,19 +77,20 @@ def encrypt_backup():
     ciphertext, tag = cipher_aes.encrypt_and_digest(data)
     [ file_out.write(x) for x in (enc_session_key, cipher_aes.nonce, tag, ciphertext) ]
     file_out.close()
-    
+   
     #os.system("openssl enc -aes-256-cbc -pbkdf2 -in " + backup_filename + " -out "+ backup_enc +" -pass file:" + public_key)
 
+
+
 def upload():
-#     transport = Paramiko.Transport(sftp_ip,sftp_port)
-#    transport.connect(NONE,sftp_user,sftp_password)
-#    sftp = paramiko.SFTPClient.from_transport(transport)
-#    sftp.put(backup_enc,remotedir_backup)
-#    sftp.close()
-#    transport.close()
-    with pysftp.Connection(sftp_ip, username=sftp_user, private_key=sftp_private_key) as sftp:
-        sftp.cd(remotedir_backup)
-        sftp.put(backup_enc,remotedir_backup)
+    private_key=paramiko.Ed25519Key.from_private_key_file(sftp_private_key)
+    client = paramiko.SSHClient()
+    client.load_system_host_keys()
+    client.connect(sftp_ip, port=sftp_port, username=sftp_user, password=None, pkey=private_key)
+    sftp = client.open_sftp()
+    sftp.chdir(path=remotedir_backup)
+    sftp.put(backup_enc,remote_backup)
+    sftp.close()
 
 
 def delete_local():
@@ -96,17 +100,27 @@ def delete_local():
 def delete_remote():
 #delete all backups older than 3rd
 
-    with pysftp.Connection(sftp_ip, username=sftp_user, private_key=sftp_private_key) as sftp:
-        sftp.cd(remotedir_backup)
-        remote_files = sftp.listdir()
-        sorted_remote_files = sorted(remote_files)
-        for n in sorted_remote_files:
-            if len(sorted_remote_files) > 3 :
-                sftp.remove(n)
-                sorted_remote_files.remove(n)
-
+    private_key=paramiko.Ed25519Key.from_private_key_file(sftp_private_key)
+    client = paramiko.SSHClient()
+    client.load_system_host_keys()
+    client.connect(sftp_ip, port=sftp_port, username=sftp_user, password=None, pkey=private_key)
+    sftp = client.open_sftp()
+    sftp.chdir(path=remotedir_backup)
+    remote_files = sftp.listdir(remotedir_backup)
+    print(remote_files)
+    sorted_remote_files = sorted(remote_files)
+    print(sorted_remote_files)
+    for n in sorted_remote_files:
+        if len(sorted_remote_files) > 3 :
+            sftp.remove(n)
+            sorted_remote_files.remove(n)
+    sftp(close)
 
 ### Exec
 
 backup_db()
 backup_site()
+encrypt_backup()
+upload()
+delete_local()
+delete_remote()

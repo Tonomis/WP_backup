@@ -30,6 +30,8 @@ cipher_aes = AES.new(session_key, AES.MODE_EAX, nonce)
 data = cipher_aes.decrypt_and_verify(ciphertext, tag)
 #print(data)
 
-with open (backup_filename+ ".decrypted", 'wb') as f:
+decrypted_backup_filename=backup_filename[:-4]
+
+with open (decrypted_backup_filename, 'wb') as f:
     f.write(data)
     f.close()

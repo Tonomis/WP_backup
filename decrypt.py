@@ -29,6 +29,9 @@ backup_enc = backup_filename + ".enc"
 public_key = "/backup/wp_backup_public.pem"
 private_keyyy = "/backup/private.pem"
 
+
+#Open file and read the session key
+
 file_in = open(backup_enc, "rb")
 
 private_key = RSA.import_key(open(private_keyyy).read())
@@ -43,8 +46,8 @@ session_key = cipher_rsa.decrypt(enc_session_key)
 # Decrypt the data with the AES session key
 cipher_aes = AES.new(session_key, AES.MODE_EAX, nonce)
 data = cipher_aes.decrypt_and_verify(ciphertext, tag)
-#print(data)
 
 with open (backup_filename+ ".decrypted", 'wb') as f:
     f.write(data)
     f.close()
+

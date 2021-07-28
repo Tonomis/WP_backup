@@ -4,36 +4,18 @@ import time
 ### Variables ###
 
 #Site info
-site_name = "wordpress"
 site_path = "/var/www/wordpress"
 
-#dB info
-db_name = "wordpress"
-db_user = "wpuser"
-db_password = "qsd123"
-
-#SFTP info
-sftp_user = "wpbackup"
-sftp_private_key = "/home/administrator/.ssh/id_ed25519"
-sftp_ip = "192.168.122.235"
-sftp_port = 22
-#Directories
-localdir_backup = "/backup/wordpress/"
-remotedir_backup = "~/backup/wordpress/"
-# Date et heure
-date = time.strftime("%Y-%m-%d")
 backup_filename = localdir_backup + "wp_site_backup_" + date + ".tgz"
-db_filename = localdir_backup + "wp_db_backup_" + date + ".sql"
 backup_enc = backup_filename + ".enc"
-#Encrypt
-public_key = "/backup/wp_backup_public.pem"
-private_keyyy = "/backup/private.pem"
+#Decrypt
+private_keyyy = "./private.pem"
 
 
-#Open file and read the session key
+#input the filename
+backup_filename=input("Please enter the backup's filename:\n"
 
-file_in = open(backup_enc, "rb")
-
+file_in = open(backup_filename, "rb")
 private_key = RSA.import_key(open(private_keyyy).read())
 
 enc_session_key, nonce, tag, ciphertext = \
@@ -46,8 +28,8 @@ session_key = cipher_rsa.decrypt(enc_session_key)
 # Decrypt the data with the AES session key
 cipher_aes = AES.new(session_key, AES.MODE_EAX, nonce)
 data = cipher_aes.decrypt_and_verify(ciphertext, tag)
+#print(data)
 
 with open (backup_filename+ ".decrypted", 'wb') as f:
     f.write(data)
     f.close()
-

@@ -107,9 +107,6 @@ def delete_remote():
     remote_files = sftp.listdir(remotedir_backup)
     sorted_remote_files = sorted(remote_files)
     for n in sorted_remote_files[:-3]:
-        print('coucou')
-        print(n+ 'file')
-        print(sorted_remote_files)
         sftp.remove(n)
     sftp.close()
 

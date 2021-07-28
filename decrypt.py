@@ -13,7 +13,7 @@ private_keyyy = "./private.pem"
 
 
 #input the filename
-backup_filename=input("Please enter the backup's filename:\n"
+backup_filename=input("Please enter the backup's filename:\n")
 
 file_in = open(backup_filename, "rb")
 private_key = RSA.import_key(open(private_keyyy).read())

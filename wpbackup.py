@@ -95,7 +95,7 @@ def upload():
 
 def delete_local():
 #delete 2nd last backup
-    os.system("find "+ localdir_backup + " -type f -not -name " + backup_filename + "-delete") 
+    os.system("find "+ localdir_backup + " -type f -not -name " + "wp_site_backup_" + date + ".tgz*" + " -delete") 
 
 def delete_remote():
 #delete all backups older than 3rd
@@ -107,14 +107,13 @@ def delete_remote():
     sftp = client.open_sftp()
     sftp.chdir(path=remotedir_backup)
     remote_files = sftp.listdir(remotedir_backup)
-    print(remote_files)
     sorted_remote_files = sorted(remote_files)
-    print(sorted_remote_files)
-    for n in sorted_remote_files:
-        if len(sorted_remote_files) > 3 :
-            sftp.remove(n)
-            sorted_remote_files.remove(n)
-    sftp(close)
+    for n in sorted_remote_files[:-3]:
+        print('coucou')
+        print(n+ 'file')
+        print(sorted_remote_files)
+        sftp.remove(n)
+    sftp.close()
 
 ### Exec
 

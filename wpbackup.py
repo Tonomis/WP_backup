@@ -12,11 +12,9 @@ import sys,os
 import tarfile
 import time
 import paramiko
-import pysftp
 from Crypto.PublicKey import RSA
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES, PKCS1_OAEP
-import gnupg
 
 ### Variables ###
 

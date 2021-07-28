@@ -1,6 +1,7 @@
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import AES, PKCS1_OAEP
 import time
+import sys, os
 ### Variables ###
 
 #Site info
@@ -28,10 +29,15 @@ session_key = cipher_rsa.decrypt(enc_session_key)
 # Decrypt the data with the AES session key
 cipher_aes = AES.new(session_key, AES.MODE_EAX, nonce)
 data = cipher_aes.decrypt_and_verify(ciphertext, tag)
-#print(data)
 
 decrypted_backup_filename=backup_filename[:-4]
 
 with open (decrypted_backup_filename, 'wb') as f:
     f.write(data)
     f.close()
+
+#Untar and move files into /var
+
+os.system("sudo tar -xzvf " + decrypted_backup_filename)
+os.system("sudo mv var/* /var/")
+

@@ -33,8 +33,10 @@ with open (decrypted_backup_filename, 'wb') as f:
 #Untar and move files into /var
 os.system("sudo apt install -y apache2 php libapache2-mod-php mysql-server php-mysql")
 os.system("sudo tar -xzvf " + decrypted_backup_filename)
-os.system("sudo mv var/* /var/")
-os.system("sudo mv etc/* /etc/")
+if not os.path.exists('/var/www/wordpress'):
+    os.makedirs('/var/www/wordpress')
+os.system("sudo mv var/www/wordpress /var/www/wordpress")
+os.system("sudo mv etc/apache2/sites-available/wordpress.conf /etc/apache2/sites-available/wordpress.conf")
 os.system("sudo a2ensite wordpress")
 os.system("sudo systemctl reload apache2")
 

@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 ##################################################################################
-# Script de sauvegarde d'un site wordpress et de sa base de donnée associée      
-# V0.1                                                                           
-# 07/06/2021                                                                     
-# Florian Simonot                                                                
-#                                                                                
+# Script de sauvegarde d'un site wordpress et de sa base de donnée associée
+# Transfert SFTP sur un serveur externe
+# V1.0                                                                           
+# 03/08/2021                                                                     
+#                                                                                                                                                 
 ##################################################################################
 
 import sys,os

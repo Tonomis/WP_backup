@@ -23,7 +23,7 @@ date = time.strftime("%Y-%m-%d")
 #Site info
 site_name = "wordpress" 
 site_path = "/var/www/wordpress"
-
+apache_conf = "/etc/apache2/sites-available/wordpress.conf"
 #dB info
 db_name = "wordpress"
 db_user = "wpuser"
@@ -53,7 +53,7 @@ def backup_db():
 
 def backup_site():
     tar = tarfile.open(backup_filename, "x:gz")
-    for name in [site_path, db_filename]:
+    for name in [site_path, apache_conf, db_filename]:
         tar.add(name)
     tar.close()
     os.remove(db_filename)

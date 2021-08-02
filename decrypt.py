@@ -1,14 +1,8 @@
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import AES, PKCS1_OAEP
-import time
 import sys, os
 ### Variables ###
 
-#Site info
-site_path = "/var/www/wordpress"
-
-backup_filename = localdir_backup + "wp_site_backup_" + date + ".tgz"
-backup_enc = backup_filename + ".enc"
 #Decrypt
 private_keyyy = "./private.pem"
 
@@ -37,7 +31,12 @@ with open (decrypted_backup_filename, 'wb') as f:
     f.close()
 
 #Untar and move files into /var
-
+os.system("sudo apt install -y apache2 php libapache2-mod-php mysql-server php-mysql")
 os.system("sudo tar -xzvf " + decrypted_backup_filename)
 os.system("sudo mv var/* /var/")
+os.system("sudo mv etc/* /etc/")
+os.system("sudo a2ensite wordpress")
+os.system("sudo systemctl reload apache2")
+
+
 

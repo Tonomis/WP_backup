@@ -16,34 +16,42 @@ from Crypto.PublicKey import RSA
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES, PKCS1_OAEP
 
+m dotenv import load_dotenv
+
+load_dotenv()
+
 ### Variables ###
+
+#dB info
+db_name = os.getenv('MYSQL_DB')
+db_user = os.getenv('MYSQL_USER')
+db_password = os.getenv('MYSQL_PASSWORD')
 
 # Date et heure
 date = time.strftime("%Y-%m-%d")
+
 #Site info
-site_name = "wordpress" 
-site_path = "/var/www/wordpress"
-apache_conf = "/etc/apache2/sites-available/wordpress.conf"
-#dB info
-db_name = "wordpress"
-db_user = "wpuser"
-db_password = "qsd123"
+site_path = os.getenv('SITE_PATH')
+apache_conf = os.getenv('APACHE_CONF')
 
 #SFTP info
-sftp_user = "wpbackup"
-sftp_private_key = "/home/administrator/.ssh/id_ed25519"
-sftp_ip = "192.168.122.235"
-sftp_port = 22
-#Directories
-localdir_backup = "/backup/wordpress/"
-remotedir_backup = "/home/wpbackup/backup/wordpress/"
-remote_backup = remotedir_backup + "wp_site_backup_" + date + ".tgz.enc"
+sftp_user = os.getenv('SFTP_USER')
+sftp_private_key = os.getenv('SFTP_PRIVATE_KEY')
+sftp_ip = os.getenv('SFTP_IP')
+sftp_port = os.getenv('SFTP_PORT')
 
+#Directories
+localdir_backup = os.getenv('LOCALDIR_BACKUP')
+remotedir_backup = os.getenv('REMOTEDIR_BACKUP')
+
+#Filenames
+remote_backup = remotedir_backup + "wp_site_backup_" + date + ".tgz.enc"
 backup_filename = localdir_backup + "wp_site_backup_" + date + ".tgz"
 db_filename = localdir_backup + "wp_db_backup_" + date + ".sql"
 backup_enc = backup_filename + ".enc"
+
 #Encrypt
-public_key = "/backup/wp_backup_public.pem"
+public_key = os.getenv('PUBLIC_KEY')
 
 
 ### Functions ###

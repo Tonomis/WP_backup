@@ -1,15 +1,19 @@
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import AES, PKCS1_OAEP
 import sys, os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 ### Variables ###
 
 #Decrypt
 private_keyyy = "./private.pem"
 
 #dB info
-db_name = "wordpress"
-db_user = "wpuser"
-db_password = "qsd123"
+db_name = os.getenv('MYSQL_DB')
+db_user = os.getenv('MYSQL_USER')
+db_password = os.getenv('MYSQL_PASSWORD')
 
 
 #input the filename

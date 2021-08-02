@@ -6,6 +6,11 @@ import sys, os
 #Decrypt
 private_keyyy = "./private.pem"
 
+#dB info
+db_name = "wordpress"
+db_user = "wpuser"
+db_password = "qsd123"
+
 
 #input the filename
 backup_filename=input("Please enter the backup's filename:\n")
@@ -38,7 +43,8 @@ if not os.path.exists('/var/www/wordpress'):
 os.system("sudo mv var/www/wordpress /var/www/wordpress")
 os.system("sudo mv etc/apache2/sites-available/wordpress.conf /etc/apache2/sites-available/wordpress.conf")
 os.system("sudo a2ensite wordpress")
+db_filename = "backup/wordpress/wp_db_backup_" + backup_filename[15:25] + ".sql"
+os.system("MYSQL_PWD=" + db_password + " mysql -u " + db_user +" " + db_name + " < " + db_filename)
 os.system("sudo systemctl reload apache2")
-
 
 

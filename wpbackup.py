@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 
 ##################################################################################
-# Script de sauvegarde d'un site wordpress et de sa base de donnée associée
-# Transfert SFTP sur un serveur externe
+#
+# Backing up wordpress's site, compress and create archive file.
+# Produce a cipher backup with a public_key (tried with RSA 2048).
+# Transfer to a distant server using SFTP protocol with ssh public key (ED25519)
+# Keep only 3 last backup on the distant server.
 # V1.0                                                                           
 # 03/08/2021                                                                     
 #                                                                                                                                                 
@@ -15,19 +18,16 @@ import paramiko
 from Crypto.PublicKey import RSA
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES, PKCS1_OAEP
-
-m dotenv import load_dotenv
+from dotenv import load_dotenv
 
 load_dotenv()
-
-### Variables ###
 
 #dB info
 db_name = os.getenv('MYSQL_DB')
 db_user = os.getenv('MYSQL_USER')
 db_password = os.getenv('MYSQL_PASSWORD')
 
-# Date et heure
+#Date and time
 date = time.strftime("%Y-%m-%d")
 
 #Site info
@@ -59,6 +59,7 @@ public_key = os.getenv('PUBLIC_KEY')
 def backup_db():
     os.system("MYSQL_PWD=" + db_password + " mysqldump -u " + db_user +" " + db_name + " > " + db_filename)
 
+# Gunzip + Tar wordpress files
 def backup_site():
     tar = tarfile.open(backup_filename, "x:gz")
     for name in [site_path, apache_conf, db_filename]:
@@ -66,9 +67,8 @@ def backup_site():
     tar.close()
     os.remove(db_filename)
 
-def encrypt_backup():
 #Encrypt file using RSA asymmetric encryption of an AES session key.
-
+def encrypt_backup():
     data = open(backup_filename, 'rb').read()
     file_out = open(backup_enc, 'wb')
     recipient_key = RSA.importKey(open(public_key).read())
@@ -85,9 +85,9 @@ def encrypt_backup():
     file_out.close()
    
     #os.system("openssl enc -aes-256-cbc -pbkdf2 -in " + backup_filename + " -out "+ backup_enc +" -pass file:" + public_key)
+    #one line possibility
 
-
-
+#Put backup to distant server
 def upload():
     private_key=paramiko.Ed25519Key.from_private_key_file(sftp_private_key)
     client = paramiko.SSHClient()
@@ -98,14 +98,12 @@ def upload():
     sftp.put(backup_enc,remote_backup)
     sftp.close()
 
-
+#Localy delete old backups
 def delete_local():
-#delete 2nd last backup
     os.system("find "+ localdir_backup + " -type f -not -name " + "wp_site_backup_" + date + ".tgz*" + " -delete") 
 
+#Remotely, keep only the last 3 backups on the distant server
 def delete_remote():
-#delete all backups older than 3rd
-
     private_key=paramiko.Ed25519Key.from_private_key_file(sftp_private_key)
     client = paramiko.SSHClient()
     client.load_system_host_keys()

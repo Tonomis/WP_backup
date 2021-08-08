@@ -2,12 +2,13 @@
 
 ##################################################################################
 #
-# Backing up wordpress's site, compress and create archive file.
+# Backing up wordpress's site, generate a file with ACLs, compress all and create archive file.
 # Produce a cipher backup with a public_key (tried with RSA 2048).
 # Transfer to a distant server using SFTP protocol with ssh public key (ED25519)
 # Keep only 3 last backup on the distant server.
-# V1.0                                                                           
-# 03/08/2021                                                                     
+# V1.0
+#
+# 08/08/2021                                                                     
 #                                                                                                                                                 
 ##################################################################################
 
@@ -47,6 +48,7 @@ remotedir_backup = os.getenv('REMOTEDIR_BACKUP')
 #Filenames
 remote_backup = remotedir_backup + "wp_site_backup_" + date + ".tgz.enc"
 backup_filename = localdir_backup + "wp_site_backup_" + date + ".tgz"
+acl_filename = localdir_backup + "wp_site_backup_" + date + ".acl"
 db_filename = localdir_backup + "wp_db_backup_" + date + ".sql"
 backup_enc = backup_filename + ".enc"
 
@@ -61,11 +63,12 @@ def backup_db():
 
 # Gunzip + Tar wordpress files
 def backup_site():
+    os.system("getfacl --recursive " + site_path + " > " + acl_filename) #save all ACLs in a file, it's always usefull 
     tar = tarfile.open(backup_filename, "x:gz")
-    for name in [site_path, apache_conf, db_filename]:
+    for name in [site_path, apache_conf, db_filename, acl_filename]:
         tar.add(name)
     tar.close()
-    os.remove(db_filename)
+    os.remove(db_filename+" "+acl_filename)
 
 #Encrypt file using RSA asymmetric encryption of an AES session key.
 def encrypt_backup():

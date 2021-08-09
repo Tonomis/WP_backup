@@ -15,7 +15,7 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import AES, PKCS1_OAEP
 import sys, os
 from dotenv import load_dotenv
-import argpars
+import argparse
 
 load_dotenv()
 ### Parser

@@ -1,4 +1,4 @@
-### WP_backup Project
+# WP_backup Project
 Is a couple of 2 scripts : 
 **wpbackup.py** is backing up wordpress's site, generate a file with ACLs, compress all and create archive file.
 Produce a cipher backup with a public_key (tried with RSA 2048). Transfer it to a distant server using SFTP protocol with ssh public key (ED25519)
@@ -31,13 +31,13 @@ openssl genrsa -out private.pem 2048
 openssl rsa -in private.pem -out public.pem -pubout -outform PEM
 ```
 
-# Backup
+### Backup
 On your actual WP machine :
 
 ```bash
 sudo python3 wpbackup.py
 ```
-# Restore
+### Restore
 grab your encrypted archive, restore.py + .env file and your private key
 
 ```bash

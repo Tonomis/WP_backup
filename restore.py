@@ -15,8 +15,17 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import AES, PKCS1_OAEP
 import sys, os
 from dotenv import load_dotenv
+import argpars
 
 load_dotenv()
+### Parser
+#load a parser to get the backup_filename
+
+parser = argparse.ArgumentParser(description='Restore Wordpress site from your wp_backup.py backup')
+parser.add_argument('filename', help='the backup filename you want to restore')
+args = parser.parse_args()
+print(args.accumulate(args.integers))
+backup_filename=args.filename
 
 ### Variables ###
 
@@ -29,8 +38,7 @@ db_user = os.getenv('MYSQL_USER')
 db_password = os.getenv('MYSQL_PASSWORD')
 
 
-#Input the filename  MODIFIER EN PARSER
-backup_filename=input("Please enter the backup's filename:\n")
+#Filename from arg
 
 file_in = open(backup_filename, "rb")
 private_key = RSA.import_key(open(private_keyyy).read())

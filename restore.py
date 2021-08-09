@@ -3,11 +3,11 @@
 ##################################################################################
 #
 # 
-# Produce a cipher backup with a public_key (tried with RSA 2048).
-# Transfer to a distant server using SFTP protocol with ssh public key (ED25519)
-# Keep only 3 last backup on the distant server.
+# Decipher you backup with your private key, uncompress it
+# Install Apache & Mysql
+# Put your Wordpress files in place and restore the database
 # V1.0                                                                           
-# 03/08/2021                                                                     
+# 08/08/2021                                                                     
 #                                                                                                                                                 
 ##################################################################################
 
@@ -68,7 +68,8 @@ if not os.path.exists('/var/www/wordpress'):
 os.system("sudo mv var/www/wordpress/ /var/www/wordpress/")
 os.system("sudo mv etc/apache2/sites-available/* /etc/apache2/sites-available/*")
 os.system("sudo a2ensite wordpress")
-os.system("sudo mysql -Bse COMMAND COMMAND")
+os.system("sudo mysql <<EOF")
+os.system("CREATE USER "+ db_user +"@'localhost' IDENTIFIED BY "+ db_password+ " ; GRANT ALL ON wordpress.* TO "+db_user+"@'localhost';FLUSH PRIVILEGES;EOF")
 db_filename = "backup/wordpress/wp_db_backup_" + backup_filename[15:25] + ".sql"
 os.system("MYSQL_PWD=" + db_password + " mysql -u " + db_user +" " + db_name + " < " + db_filename)
 os.system("sudo systemctl reload apache2")

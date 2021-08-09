@@ -16,8 +16,6 @@ apt install python3
 pip install -r requirements.txt
 ```
 
-(do it as root for the restored machine)
-
 ## Usage
 fill the .env.example for your system configuration and rename it in .env
 Don't forget to copy your public ssh key in your backup server.
@@ -33,11 +31,11 @@ openssl genrsa -out private.pem 2048
 openssl rsa -in private.pem -out public.pem -pubout -outform PEM
 ```
 
-#Backup
+# Backup
 On your actual WP machine :
 
 ```bash
-python3 wpbackup.py
+sudo python3 wpbackup.py
 ```
 # Restore
 grab your encrypted archive, restore.py + .env file and your private key

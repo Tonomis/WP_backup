@@ -64,9 +64,9 @@ os.system("sudo apt install -y apache2 php libapache2-mod-php mysql-server php-m
 os.system("sudo tar -xzvf " + decrypted_backup_filename)
 if not os.path.exists('/var/www/wordpress'):
     os.makedirs('/var/www/wordpress')
-os.system("sudo mv ./var/www/wordpress/ /var/www/wordpress/")
-os.system("sudo mv ./etc/apache2/sites-available/* /etc/apache2/sites-available/*")
-os.system("sudo ae2mod rewrite")
+os.system("sudo mv ./var/www/wordpress/* /var/www/wordpress/")
+os.system("sudo mv ./etc/apache2/sites-available/* /etc/apache2/sites-available/")
+os.system("sudo a2enmod rewrite")
 os.system("sudo a2ensite wordpress")
 os.system('sudo mysql --skip-column-names -B -e "CREATE DATABASE '+db_name+ " ;CREATE USER "+ db_user +"@'localhost' IDENTIFIED BY "+ db_password+ " ; GRANT ALL ON wordpress.* TO "+db_user+"@'localhost';FLUSH PRIVILEGES;")
 db_filename = "backup/wordpress/wp_db_backup_" + backup_filename[15:25] + ".sql"

@@ -24,7 +24,6 @@ load_dotenv()
 parser = argparse.ArgumentParser(description='Restore Wordpress site from your wp_backup.py backup')
 parser.add_argument('filename', help='the backup filename you want to restore')
 args = parser.parse_args()
-print(args.accumulate(args.integers))
 backup_filename=args.filename
 
 ### Variables ###
@@ -65,11 +64,11 @@ os.system("sudo apt install -y apache2 php libapache2-mod-php mysql-server php-m
 os.system("sudo tar -xzvf " + decrypted_backup_filename)
 if not os.path.exists('/var/www/wordpress'):
     os.makedirs('/var/www/wordpress')
-os.system("sudo mv var/www/wordpress/ /var/www/wordpress/")
-os.system("sudo mv etc/apache2/sites-available/* /etc/apache2/sites-available/*")
+os.system("sudo mv ./var/www/wordpress/ /var/www/wordpress/")
+os.system("sudo mv ./etc/apache2/sites-available/* /etc/apache2/sites-available/*")
+os.system("sudo ae2mod rewrite")
 os.system("sudo a2ensite wordpress")
-os.system("sudo mysql <<EOF")
-os.system("CREATE USER "+ db_user +"@'localhost' IDENTIFIED BY "+ db_password+ " ; GRANT ALL ON wordpress.* TO "+db_user+"@'localhost';FLUSH PRIVILEGES;EOF")
+os.system('sudo mysql --skip-column-names -B -e "CREATE DATABASE '+db_name+ " ;CREATE USER "+ db_user +"@'localhost' IDENTIFIED BY "+ db_password+ " ; GRANT ALL ON wordpress.* TO "+db_user+"@'localhost';FLUSH PRIVILEGES;")
 db_filename = "backup/wordpress/wp_db_backup_" + backup_filename[15:25] + ".sql"
 os.system("MYSQL_PWD=" + db_password + " mysql -u " + db_user +" " + db_name + " < " + db_filename)
 os.system("sudo systemctl reload apache2")

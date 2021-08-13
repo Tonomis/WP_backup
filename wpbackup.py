@@ -63,12 +63,13 @@ def backup_db():
 
 # Gunzip + Tar wordpress files
 def backup_site():
-    os.system("getfacl --recursive " + site_path + " > " + acl_filename) #save all ACLs in a file, it's always usefull 
+    os.system("getfacl --recursive --absolute-names " + site_path + " > " + acl_filename) #save all ACLs in a file, it's always usefull 
     tar = tarfile.open(backup_filename, "x:gz")
     for name in [site_path, apache_conf, db_filename, acl_filename]:
         tar.add(name)
     tar.close()
-    os.remove(db_filename+" "+acl_filename)
+    os.remove(db_filename)
+    os.remove(acl_filename)
 
 #Encrypt file using RSA asymmetric encryption of an AES session key.
 def encrypt_backup():
@@ -94,6 +95,7 @@ def encrypt_backup():
 def upload():
     private_key=paramiko.Ed25519Key.from_private_key_file(sftp_private_key)
     client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.load_system_host_keys()
     client.connect(sftp_ip, port=sftp_port, username=sftp_user, password=None, pkey=private_key)
     sftp = client.open_sftp()
@@ -109,6 +111,7 @@ def delete_local():
 def delete_remote():
     private_key=paramiko.Ed25519Key.from_private_key_file(sftp_private_key)
     client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.load_system_host_keys()
     client.connect(sftp_ip, port=sftp_port, username=sftp_user, password=None, pkey=private_key)
     sftp = client.open_sftp()
